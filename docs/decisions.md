@@ -38,3 +38,31 @@ Nous retenons :
 ### Conséquences et compromis
 - **Avantages** : Déploiement ultra-simple sur un petit VPS (< 10 $/mois), réactivité de développement maximale, traçabilité des règles métier dans `services.py`.
 - **Compromis** : Les calculs longs doivent être évités dans le cycle requête/réponse HTTP direct. L'orchestration par cron sera remplacée par une vraie file de messages lorsque le volume l'exigera.
+
+---
+
+## ADR 002 : Modèle User personnalisé UUID, authentification par email et profil SellerProfile
+
+- **Date** : 2026-11-21
+- **Statut** : Accepté
+
+### Contexte
+La plateforme nécessite une gestion des utilisateurs centrée sur l'e-mail (sans champ pseudo/username) et un modèle de rôle vendeur soumis à un contrôle strict. En Django, la déclaration de `AUTH_USER_MODEL` doit être effectuée avant la toute première migration pour éviter les problèmes de clés étrangères figées sur `auth.User`. De plus, la base de données PostgreSQL 18 locale (port 5433) est retenue pour le développement et la production.
+
+### Décision
+1. **Modèle `User` personnalisé** :
+   - Clé primaire en UUID v4 (`UUIDModel`) pour rendre les identifiants publics non devinables.
+   - `email` unique servant d'identifiant de connexion, normalisé en minuscules.
+   - Normalisation stricte des numéros guinéens (+224 / 9 chiffres commençant par 6).
+   - Intégration de `django-allauth` avec `ACCOUNT_LOGIN_METHODS = {'email'}`.
+2. **Modèle `SellerProfile` distinct (OneToOne)** :
+   - Statut à choix stricts : `pending`, `verified`, `suspended`.
+   - Traçabilité de la vérification manuelle : `verified_by` (administrateur), `verified_at`, et `internal_notes`.
+   - **Règle non négociable** : Aucune pièce d'identité n'est stockée en base de données.
+3. **Couche de services et sélecteurs** :
+   - Toute création d'utilisateur, demande de statut vendeur, vérification ou suspension transite exclusivement par `apps/accounts/services.py`.
+   - Les requêtes de lecture complexes et filtrées sont centralisées dans `apps/accounts/selectors.py`.
+
+### Conséquences et compromis
+- **Avantages** : Zéro dette technique sur le modèle User ; sécurité dès la racine ; étanchéité entre compte acheteur simple et statut vendeur vérifié.
+- **Compromis** : Nécessite une rigueur constante pour ne jamais contourner les services lors des transitions de statut.
