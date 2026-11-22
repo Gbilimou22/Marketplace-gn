@@ -17,6 +17,7 @@ class CoreConfig(AppConfig):
             def _base_context_copy(self):
                 cls = self.__class__
                 duplicate = cls.__new__(cls)
+                duplicate.__dict__ = self.__dict__.copy()
                 duplicate.dicts = self.dicts[:]
                 return duplicate
 
