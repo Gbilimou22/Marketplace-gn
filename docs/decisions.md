@@ -66,3 +66,33 @@ La plateforme nécessite une gestion des utilisateurs centrée sur l'e-mail (san
 ### Conséquences et compromis
 - **Avantages** : Zéro dette technique sur le modèle User ; sécurité dès la racine ; étanchéité entre compte acheteur simple et statut vendeur vérifié.
 - **Compromis** : Nécessite une rigueur constante pour ne jamais contourner les services lors des transitions de statut.
+
+---
+
+## ADR 003 : Modèle Shop, validation administrative manuelle et canal direct WhatsApp (wa.me)
+
+- **Date** : 2026-11-22
+- **Statut** : Accepté
+
+### Contexte
+La boutique (`Shop`) est le pivot de la place de marché guinéenne. Les vendeurs habituels vendent sur les réseaux sociaux (WhatsApp, Facebook) ou dans les marchés physiques (Madina, etc.). Pour instaurer la confiance et respecter les contraintes de budget et de données mobiles en Guinée :
+1. Une boutique ne doit pas être visible publiquement tant qu'elle n'a pas été inspectée et approuvée manuellement par l'administrateur.
+2. Le contact doit être direct et sans coût d'API payante (Twilio, Meta WhatsApp Cloud API).
+
+### Décision
+1. **Cycle de vie de la boutique (`Shop.status`)** :
+   - `DRAFT` : la boutique est créée par le vendeur, visible uniquement par lui-même.
+   - `PENDING_REVIEW` : le vendeur soumet sa boutique pour vérification administrative.
+   - `ACTIVE` : seul un administrateur (`is_staff`) peut activer la boutique après vérification. Cette activation valide automatiquement le profil vendeur (`SellerProfile`) s'il était en attente.
+   - `SUSPENDED` : suspension immédiate par l'administrateur en cas de manquement.
+2. **Canal de contact WhatsApp direct sans frais** :
+   - Génération dynamique de liens standard `https://wa.me/224XXXXXXXX?text=...` pré-remplis avec encodage URL.
+   - Zéro dépendance à une API tierce payante de messagerie.
+3. **Contrôle d'accès et isolation des données** :
+   - Les vues publiques (`ShopListView`, `ShopDetailView`) ne servent que les boutiques actives aux visiteurs anonymes.
+   - Les propriétaires et administrateurs peuvent prévisualiser les boutiques non actives.
+   - Les modifications (`shop_update`) imposent une vérification d'appartenance stricte (`shop.owner.user == request.user`).
+
+### Conséquences et compromis
+- **Avantages** : Aucun coût d'API pour les échanges vendeur/acheteur, protection absolue des acheteurs contre les boutiques frauduleuses grâce à la modération humaine.
+- **Compromis** : Le volume d'activation dépend de la disponibilité de l'administrateur pour passer les appels ou vidéos de validation.

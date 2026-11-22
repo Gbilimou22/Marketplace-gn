@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Espace Vendeur - Vos Boutiques{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+    <div>
+        <h1 style="font-size: 1.5rem;">Espace Vendeur</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Gérez vos boutiques et vos coordonnées de contact.</p>
+    </div>
+    <a href="{% url 'shops:create' %}" class="btn btn-primary">+ Créer une nouvelle boutique</a>
+</div>
+
+<!-- Statut du compte vendeur -->
+<div class="card" style="margin-bottom: 1.5rem; background: #F8FAFC;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+            <h3 style="font-size: 1rem; margin-bottom: 0.25rem;">Statut de votre compte vendeur</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+                {% if seller_profile.is_verified %}
+                    ✅ Votre profil vendeur est <strong>vérifié</strong>. Vos boutiques actives sont visibles de tous les acheteurs.
+                {% elif seller_profile.is_pending %}
+                    ⏳ Votre profil est <strong>en cours de vérification</strong> par l'administrateur.
+                {% elif seller_profile.is_suspended %}
+                    ❌ Votre compte vendeur est <strong>suspendu</strong>.
+                {% else %}
+                    Vous n'avez pas encore soumis de boutique.
+                {% endif %}
+            </p>
+        </div>
+        {% if seller_profile %}
+            <span class="badge {% if seller_profile.is_verified %}badge-active{% elif seller_profile.is_pending %}badge-pending{% else %}badge-suspended{% endif %}">
+                {{ seller_profile.get_status_display }}
+            </span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Liste des boutiques du vendeur -->
+<h2 style="font-size: 1.2rem; margin-bottom: 1rem;">Vos boutiques</h2>
+
+<div style="display: flex; flex-direction: column; gap: 1rem;">
+    {% for shop in shops %}
+        <div class="card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                    <h3 style="font-size: 1.15rem; font-weight: 600;">{{ shop.name }}</h3>
+                    {% if shop.is_active %}
+                        <span class="badge badge-active">En ligne</span>
+                    {% elif shop.is_pending_review %}
+                        <span class="badge badge-pending">En attente de revue</span>
+                    {% elif shop.is_draft %}
+                        <span class="badge badge-draft">Brouillon</span>
+                    {% else %}
+                        <span class="badge badge-suspended">Suspendue</span>
+                    {% endif %}
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.85rem;">
+                    📍 {{ shop.city }} • WhatsApp : {{ shop.whatsapp_number }}
+                </p>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <a href="{% url 'shops:detail' slug=shop.slug %}" class="btn btn-outline" style="font-size: 0.85rem;">Aperçu</a>
+                <a href="{% url 'shops:update' slug=shop.slug %}" class="btn btn-outline" style="font-size: 0.85rem;">Modifier</a>
+
+                {% if shop.is_draft %}
+                    <form method="post" action="{% url 'shops:submit_review' slug=shop.slug %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary" style="font-size: 0.85rem;">Soumettre pour validation</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <div class="card" style="text-align: center; padding: 2rem;">
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">Vous n'avez pas encore créé de boutique.</p>
+            <a href="{% url 'shops:create' %}" class="btn btn-primary">Créer ma première boutique</a>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

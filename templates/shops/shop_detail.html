@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}{{ shop.name }} - Place de Marché Guinée{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                <h1 style="font-size: 1.6rem;">{{ shop.name }}</h1>
+                {% if shop.is_active %}
+                    <span class="badge badge-active">Boutique Vérifiée</span>
+                {% elif shop.is_pending_review %}
+                    <span class="badge badge-pending">En attente de validation</span>
+                {% elif shop.is_draft %}
+                    <span class="badge badge-draft">Brouillon</span>
+                {% else %}
+                    <span class="badge badge-suspended">Suspendue</span>
+                {% endif %}
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.25rem;">
+                📍 Localisation : <strong>{{ shop.city }}</strong> {% if shop.address %}({{ shop.address }}){% endif %}
+            </p>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                👤 Responsable : {{ shop.owner.user.full_name }}
+            </p>
+        </div>
+
+        {% if shop.whatsapp_url %}
+            <div>
+                <a href="{{ shop.whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" style="padding: 0.75rem 1.25rem; font-size: 1rem;">
+                    💬 Contacter le vendeur sur WhatsApp
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if shop.description %}
+        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+            <h3 style="font-size: 1.05rem; margin-bottom: 0.5rem;">À propos de la boutique</h3>
+            <p style="white-space: pre-line; color: #374151;">{{ shop.description }}</p>
+        </div>
+    {% endif %}
+
+    {% if user.is_authenticated and shop.owner.user == user %}
+        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; gap: 0.75rem;">
+            <a href="{% url 'shops:update' slug=shop.slug %}" class="btn btn-outline">Modifier ma boutique</a>
+            <a href="{% url 'shops:seller_dashboard' %}" class="btn btn-outline">Tableau de bord</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Emplacement pour le catalogue d'articles (Phase 3) -->
+<div class="card" style="text-align: center; padding: 2rem 1rem;">
+    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Articles en vente</h3>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Le catalogue de produits de cette boutique sera consultable ici dès la Phase 3.
+    </p>
+</div>
+{% endblock %}

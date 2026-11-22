@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Place de Marché Guinée{% endblock %}</title>
+    <style>
+        :root {
+            --primary: #059669;
+            --primary-hover: #047857;
+            --whatsapp: #25D366;
+            --whatsapp-hover: #1EBE5D;
+            --bg: #F9FAFB;
+            --surface: #FFFFFF;
+            --text: #111827;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+            --danger: #DC2626;
+            --warning: #D97706;
+            --radius: 8px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.5; }
+        header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.75rem 1rem; position: sticky; top: 0; z-index: 100; }
+        .nav-container { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.15rem; font-weight: bold; color: var(--primary); text-decoration: none; }
+        .nav-links a { margin-left: 1rem; text-decoration: none; color: var(--text); font-size: 0.9rem; }
+        .nav-links a.btn-cta { background: var(--primary); color: white; padding: 0.4rem 0.8rem; border-radius: var(--radius); }
+        main { max-width: 1000px; margin: 1.5rem auto; padding: 0 1rem; min-height: 80vh; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1rem; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 1rem; border-radius: var(--radius); text-decoration: none; font-weight: 500; cursor: pointer; border: 1px solid transparent; font-size: 0.95rem; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-whatsapp { background: var(--whatsapp); color: white; }
+        .btn-whatsapp:hover { background: var(--whatsapp-hover); }
+        .btn-outline { border-color: var(--border); background: transparent; color: var(--text); }
+        .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+        .badge-active { background: #D1FAE5; color: #065F46; }
+        .badge-pending { background: #FEF3C7; color: #92400E; }
+        .badge-draft { background: #F3F4F6; color: #374151; }
+        .badge-suspended { background: #FEE2E2; color: #991B1B; }
+        .messages { list-style: none; margin-bottom: 1rem; }
+        .messages li { padding: 0.75rem 1rem; border-radius: var(--radius); margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .messages li.success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+        .messages li.error { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 0.3rem; font-size: 0.9rem; }
+        .form-input, .form-select, .form-textarea { width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.95rem; }
+        footer { border-top: 1px solid var(--border); background: var(--surface); padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 2rem; }
+        @media (max-width: 640px) {
+            .nav-container { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+            .nav-links { width: 100%; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+            .nav-links a { margin-left: 0; }
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="{% url 'shops:list' %}" class="logo">🇬🇳 Marché Guinée</a>
+            <nav class="nav-links">
+                <a href="{% url 'shops:list' %}">Boutiques</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'shops:seller_dashboard' %}">Espace Vendeur</a>
+                    <a href="{% url 'account_logout' %}">Déconnexion ({{ user.full_name }})</a>
+                {% else %}
+                    <a href="{% url 'account_login' %}">Connexion</a>
+                    <a href="{% url 'account_signup' %}" class="btn-cta">Créer un compte</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>Place de marché Guinée &copy; 2026. Transactions directes, confiance et vérification locale.</p>
+    </footer>
+</body>
+</html>
