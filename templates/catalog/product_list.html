@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Catalogue - Articles de mode et électronique en Guinée{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 1.5rem;">
+    <h1 style="font-size: 1.6rem; margin-bottom: 0.5rem;">Place de Marché Guinée</h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Articles vérifiés de mode et électronique vendus par des commerçants de confiance en Guinée.
+    </p>
+</div>
+
+<!-- Barre de recherche et Filtres combinés -->
+<div class="card" style="margin-bottom: 1.5rem;">
+    <form method="get" action="{% url 'catalog:list' %}">
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+            <input type="text" name="q" value="{{ query }}" placeholder="Rechercher un article, marque, modèle... (ex: iPhone, Robe, Samsung)" class="form-input" style="flex: 2; min-width: 220px;">
+            <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.25rem;">Rechercher</button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.75rem; align-items: end;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label style="font-size: 0.85rem;">Catégorie</label>
+                <select name="category" class="form-select">
+                    <option value="">Toutes les catégories</option>
+                    {% for cat in categories %}
+                        <optgroup label="{{ cat.name }}">
+                            <option value="{{ cat.slug }}" {% if cat.slug == selected_category %}selected{% endif %}>{{ cat.name }} (Tout)</option>
+                            {% for child in cat.children.all %}
+                                <option value="{{ child.slug }}" {% if child.slug == selected_category %}selected{% endif %}>&nbsp;&nbsp;{{ child.name }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label style="font-size: 0.85rem;">Ville / Localité</label>
+                <select name="city" class="form-select">
+                    <option value="">Toutes les villes</option>
+                    {% for val, label in cities %}
+                        <option value="{{ val }}" {% if val == selected_city %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label style="font-size: 0.85rem;">État</label>
+                <select name="condition" class="form-select">
+                    <option value="">Tous les états</option>
+                    <option value="new" {% if selected_condition == 'new' %}selected{% endif %}>Neuf</option>
+                    <option value="used" {% if selected_condition == 'used' %}selected{% endif %}>Occasion</option>
+                    <option value="refurbished" {% if selected_condition == 'refurbished' %}selected{% endif %}>Reconditionné</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                <label style="font-size: 0.85rem;">Tri</label>
+                <select name="sort" class="form-select">
+                    <option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>Plus récents</option>
+                    <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Prix : croissant</option>
+                    <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Prix : décroissant</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem; align-items: center; justify-content: flex-end;">
+            {% if query or selected_category or selected_city or selected_condition or min_price or max_price %}
+                <a href="{% url 'catalog:list' %}" class="btn btn-outline" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">Réinitialiser</a>
+            {% endif %}
+            <button type="submit" class="btn btn-primary" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">Appliquer les filtres</button>
+        </div>
+    </form>
+</div>
+
+<!-- Grille des articles -->
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem;">
+    {% for product in products %}
+        <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <a href="{% url 'catalog:detail' slug=product.slug %}" style="text-decoration: none; color: inherit; display: block;">
+                    <div style="height: 180px; background: #E5E7EB; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+                        {% if product.cover_image %}
+                            <img src="{{ product.cover_image.image.url }}" alt="{{ product.title }}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                            <span style="font-size: 2.5rem; color: #9CA3AF;">🛍️</span>
+                        {% endif %}
+                        <span class="badge" style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.65); color: white;">
+                            {{ product.get_condition_display }}
+                        </span>
+                    </div>
+
+                    <div style="padding: 0.85rem;">
+                        <h2 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.35rem; line-height: 1.3;">
+                            {{ product.title|truncatechars:45 }}
+                        </h2>
+                        <p style="font-size: 1.15rem; font-weight: bold; color: var(--primary); margin-bottom: 0.35rem;">
+                            {{ product.price_gnf|floatformat:0 }} GNF
+                        </p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">
+                            📍 {{ product.shop.city }} • <span style="font-weight: 500;">{{ product.shop.name }}</span>
+                        </p>
+                    </div>
+                </a>
+            </div>
+
+            <div style="padding: 0.85rem; padding-top: 0; border-top: 1px solid var(--border); display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                <a href="{% url 'catalog:detail' slug=product.slug %}" class="btn btn-outline" style="flex: 1; font-size: 0.8rem; padding: 0.4rem;">Détails</a>
+                {% if product.whatsapp_order_url %}
+                    <a href="{{ product.whatsapp_order_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" style="flex: 1; font-size: 0.8rem; padding: 0.4rem;">
+                        WhatsApp
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem;">
+            <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 1rem;">
+                Aucun article ne correspond à votre recherche pour le moment.
+            </p>
+            {% if user.is_authenticated %}
+                <a href="{% url 'shops:seller_dashboard' %}" class="btn btn-primary">Publier un article dans ma boutique</a>
+            {% else %}
+                <a href="{% url 'account_signup' %}" class="btn btn-primary">Créer un compte vendeur</a>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

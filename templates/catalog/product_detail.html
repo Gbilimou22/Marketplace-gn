@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.title }} - {{ product.price_gnf }} GNF - Place de Marché{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Galerie de photos (WebP ultra-légères avec loading lazy) -->
+    <div>
+        <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 0.75rem;">
+            <div style="width: 100%; height: 360px; background: #F3F4F6; display: flex; align-items: center; justify-content: center;">
+                {% if product.cover_image %}
+                    <img id="main-product-img" src="{{ product.cover_image.image.url }}" alt="{{ product.title }}" style="width: 100%; height: 100%; object-fit: contain;">
+                {% else %}
+                    <span style="font-size: 4rem; color: #9CA3AF;">🛍️</span>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if product.images.all.count > 1 %}
+            <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem;">
+                {% for img in product.images.all %}
+                    <div style="width: 70px; height: 70px; border-radius: var(--radius); border: 2px solid {% if img.is_cover %}var(--primary){% else %}var(--border){% endif %}; overflow: hidden; cursor: pointer; flex-shrink: 0;"
+                         onclick="document.getElementById('main-product-img').src='{{ img.image.url }}';">
+                        <img src="{{ img.image.url }}" alt="Miniature" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Détails de l'article & Action WhatsApp -->
+    <div>
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                <span class="badge {% if product.condition == 'new' %}badge-active{% else %}badge-pending{% endif %}">
+                    État : {{ product.get_condition_display }}
+                </span>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">
+                    Réf : {{ product.category.name }}
+                </span>
+            </div>
+
+            <h1 style="font-size: 1.6rem; font-weight: 700; margin-bottom: 0.75rem;">{{ product.title }}</h1>
+
+            <div style="font-size: 1.8rem; font-weight: 800; color: var(--primary); margin-bottom: 1rem;">
+                {{ product.price_gnf|floatformat:0 }} GNF
+            </div>
+
+            {% if product.brand %}
+                <p style="font-size: 0.95rem; margin-bottom: 0.5rem;">
+                    <strong>Marque :</strong> {{ product.brand }}
+                </p>
+            {% endif %}
+
+            <p style="font-size: 0.95rem; margin-bottom: 1.5rem;">
+                <strong>Disponibilité :</strong>
+                {% if product.is_in_stock %}
+                    <span style="color: var(--primary); font-weight: 600;">En stock ({{ product.stock }})</span>
+                {% else %}
+                    <span style="color: var(--danger); font-weight: 600;">Rupture de stock</span>
+                {% endif %}
+            </p>
+
+            <!-- Bouton principal WhatsApp direct -->
+            {% if product.whatsapp_order_url %}
+                <a href="{{ product.whatsapp_order_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" style="width: 100%; padding: 0.9rem; font-size: 1.05rem; margin-bottom: 1rem;">
+                    💬 Commander sur WhatsApp avec le vendeur
+                </a>
+            {% endif %}
+
+            <!-- Informations sur la boutique vendeuse -->
+            <div style="padding: 1rem; background: #F8FAFC; border-radius: var(--radius); border: 1px solid var(--border);">
+                <h3 style="font-size: 1rem; margin-bottom: 0.35rem;">Vendu par {{ product.shop.name }}</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                    📍 Localisation : {{ product.shop.city }} {% if product.shop.address %}({{ product.shop.address }}){% endif %}
+                </p>
+                <div style="display: flex; gap: 0.5rem;">
+                    <a href="{% url 'shops:detail' slug=product.shop.slug %}" class="btn btn-outline" style="font-size: 0.85rem; padding: 0.35rem 0.7rem;">
+                        Visiter la boutique
+                    </a>
+                </div>
+            </div>
+
+            <!-- Actions d'édition réservées au propriétaire -->
+            {% if user.is_authenticated and product.shop.owner.user == user %}
+                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <a href="{% url 'catalog:update' slug=product.slug %}" class="btn btn-outline">Modifier</a>
+                    <a href="{% url 'catalog:seller_product_images' slug=product.slug %}" class="btn btn-outline">Gérer les photos ({{ product.images.count }}/8)</a>
+                    
+                    <form method="post" action="{% url 'catalog:publish_toggle' slug=product.slug %}" style="display: inline;">
+                        {% csrf_token %}
+                        {% if product.is_published %}
+                            <input type="hidden" name="action" value="hide">
+                            <button type="submit" class="btn btn-outline" style="color: var(--warning);">Masquer</button>
+                        {% else %}
+                            <input type="hidden" name="action" value="publish">
+                            <button type="submit" class="btn btn-primary">Publier l'article</button>
+                        {% endif %}
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Description détaillée -->
+<div class="card">
+    <h2 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Description de l'article</h2>
+    <div style="white-space: pre-line; line-height: 1.6; color: #374151;">
+        {{ product.description }}
+    </div>
+</div>
+{% endblock %}

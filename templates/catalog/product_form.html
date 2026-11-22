@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if object %}Modifier {{ object.title }}{% else %}Ajouter un article - {{ shop.name }}{% endif %}
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 650px; margin: 0 auto;">
+    <div class="card">
+        <h1 style="font-size: 1.4rem; margin-bottom: 0.5rem;">
+            {% if object %}Modifier l'article : {{ object.title }}{% else %}Nouvel article pour {{ shop.name }}{% endif %}
+        </h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+            Renseignez précisément les détails de votre article. Le prix est en Francs Guinéens (GNF), montants entiers stricts.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.title.id_for_label }}">Titre de l'article *</label>
+                {{ form.title }}
+                {% if form.title.errors %}<div style="color: var(--danger); font-size: 0.85rem;">{{ form.title.errors|striptags }}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.category.id_for_label }}">Catégorie *</label>
+                {{ form.category }}
+                {% if form.category.errors %}<div style="color: var(--danger); font-size: 0.85rem;">{{ form.category.errors|striptags }}</div>{% endif %}
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="{{ form.price_gnf.id_for_label }}">Prix en GNF *</label>
+                    {{ form.price_gnf }}
+                    {% if form.price_gnf.errors %}<div style="color: var(--danger); font-size: 0.85rem;">{{ form.price_gnf.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.condition.id_for_label }}">État *</label>
+                    {{ form.condition }}
+                    {% if form.condition.errors %}<div style="color: var(--danger); font-size: 0.85rem;">{{ form.condition.errors|striptags }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="{{ form.brand.id_for_label }}">Marque déclarée</label>
+                    {{ form.brand }}
+                    {% if form.brand.errors %}<div style="color: var(--danger); font-size: 0.85rem;">{{ form.brand.errors|striptags }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.stock.id_for_label }}">Quantité en stock *</label>
+                    {{ form.stock }}
+                    {% if form.stock.errors %}<div style="color: var(--danger); font-size: 0.85rem;">{{ form.stock.errors|striptags }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.description.id_for_label }}">Description détaillée *</label>
+                {{ form.description }}
+                {% if form.description.errors %}<div style="color: var(--danger); font-size: 0.85rem;">{{ form.description.errors|striptags }}</div>{% endif %}
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Enregistrer</button>
+                <a href="{% url 'shops:seller_dashboard' %}" class="btn btn-outline">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

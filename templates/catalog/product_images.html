@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Photos de {{ product.title }} ({{ images.count }}/8){% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+            <h1 style="font-size: 1.4rem;">Photos de : {{ product.title }}</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Format WebP automatique, suppression des données GPS de vos photos. Maximum 8 photos.
+            </p>
+        </div>
+        <a href="{% url 'catalog:detail' slug=product.slug %}" class="btn btn-outline">Voir l'article</a>
+    </div>
+
+    <!-- Formulaire d'ajout de photo si < 8 -->
+    {% if images.count < 8 %}
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.05rem; margin-bottom: 0.75rem;">Ajouter une photo ({{ images.count }}/8)</h3>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.image }}
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                    {{ form.is_cover }}
+                    <label for="{{ form.is_cover.id_for_label }}" style="margin-bottom: 0; font-weight: normal; font-size: 0.9rem;">
+                        Définir comme photo principale de couverture
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Téléverser et optimiser la photo</button>
+            </form>
+        </div>
+    {% else %}
+        <div class="card" style="margin-bottom: 1.5rem; background: #FEF3C7; color: #92400E;">
+            Vous avez atteint la limite maximale autorisée de 8 photos pour cet article.
+        </div>
+    {% endif %}
+
+    <!-- Liste des photos actuelles -->
+    <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem;">Photos actuelles ({{ images.count }})</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem;">
+        {% for img in images %}
+            <div class="card" style="padding: 0.5rem; text-align: center; position: relative;">
+                <div style="height: 120px; border-radius: var(--radius); overflow: hidden; margin-bottom: 0.5rem;">
+                    <img src="{{ img.image.url }}" alt="Photo" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                {% if img.is_cover %}
+                    <span class="badge badge-active" style="display: block; margin-bottom: 0.5rem;">Couverture</span>
+                {% endif %}
+                <form method="post" action="{% url 'catalog:image_delete' image_id=img.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline" style="color: var(--danger); font-size: 0.75rem; padding: 0.25rem 0.5rem; width: 100%;">
+                        Supprimer
+                    </button>
+                </form>
+            </div>
+        {% empty %}
+            <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 1.5rem; color: var(--text-muted);">
+                Aucune photo ajoutée pour cet article. Ajoutez-en au moins une pour pouvoir le publier.
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Bouton pour publier si au moins 1 photo -->
+    {% if not product.is_published and images.count > 0 %}
+        <div style="margin-top: 2rem; text-align: center;">
+            <form method="post" action="{% url 'catalog:publish_toggle' slug=product.slug %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="publish">
+                <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem; font-size: 1rem;">
+                    🚀 Publier l'article sur la place de marché
+                </button>
+            </form>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

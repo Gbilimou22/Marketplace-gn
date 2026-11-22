@@ -96,3 +96,37 @@ La boutique (`Shop`) est le pivot de la place de marché guinéenne. Les vendeur
 ### Conséquences et compromis
 - **Avantages** : Aucun coût d'API pour les échanges vendeur/acheteur, protection absolue des acheteurs contre les boutiques frauduleuses grâce à la modération humaine.
 - **Compromis** : Le volume d'activation dépend de la disponibilité de l'administrateur pour passer les appels ou vidéos de validation.
+
+---
+
+## ADR 004 : Catalogue de produits, pipeline WebP avec Pillow et recherche plein texte PostgreSQL
+
+- **Date** : 2026-11-22
+- **Statut** : Accepté
+
+### Contexte
+Le catalogue de mode et d'électronique en Guinée doit répondre à trois contraintes majeures :
+1. Les acheteurs naviguent depuis des smartphones avec des connexions 3G/4G lentes et une tarification au Mo.
+2. Les commerçants téléversent des photos directement depuis leurs smartphones, qui contiennent souvent des métadonnées de géolocalisation GPS privées et des résolutions démesurées (10 à 15 Mo).
+3. Le moteur de recherche doit permettre de retrouver rapidement des articles par marque, modèle ou description sans recourir à un service tiers payant (comme Algolia ou Elasticsearch).
+
+### Décision
+1. **Modèles `Category`, `Product` et `ProductImage`** :
+   - Catégories arborescentes (Mode, Électronique et sous-catégories) avec `on_delete=PROTECT` pour empêcher la destruction accidentelle d'articles.
+   - Prix obligatoirement entiers en Francs Guinéens (`PositiveBigIntegerField`, minimum 1 GNF, pas de centimes).
+   - États d'articles standardisés : `Neuf`, `Occasion`, `Reconditionné`.
+   - Limite stricte de **8 photos par produit**.
+2. **Pipeline d'optimisation d'images Pillow** :
+   - Vérification du type MIME réel à l'ouverture du fichier (rejet strict des faux fichiers).
+   - Suppression intégrale des métadonnées EXIF (anonymisation GPS complète).
+   - Redimensionnement automatique si la dimension excède 1600 px (protection contre les bombes de décompression).
+   - Compression et conversion en WebP natif (qualité 80), allégeant les fichiers de 70 à 90%.
+3. **Recherche plein texte native PostgreSQL (`django.contrib.postgres`)** :
+   - Utilisation de `SearchVector` pondéré sur le titre (A), la marque (B) et la description (C).
+   - Filtres combinés (catégorie et enfants, ville de la boutique, état, fourchette de prix min/max).
+4. **Lien de commande WhatsApp direct** :
+   - Chaque fiche article génère automatiquement un lien `wa.me` pré-rempli avec le nom de l'article, son prix en GNF et le nom de la boutique.
+
+### Conséquences et compromis
+- **Avantages** : Préservation maximale du forfait internet des utilisateurs, respect absolu de la vie privée des vendeurs, rapidité de recherche sans coût d'infrastructure supplémentaire.
+- **Compromis** : L'encodage WebP synchrone par Pillow consomme un peu de CPU à l'upload mais reste parfaitement adapté aux volumes d'une phase pilote solo.
