@@ -126,3 +126,7 @@ ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = "none"
 
+# Redirection post-connexion et post-déconnexion
+LOGIN_REDIRECT_URL = "shops:seller_dashboard"
+LOGOUT_REDIRECT_URL = "catalog:list"
+

@@ -10,6 +10,7 @@ from django.views.generic import RedirectView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("accounts/profile/", RedirectView.as_view(pattern_name="shops:seller_dashboard", permanent=False)),
     path("accounts/", include("allauth.urls")),
     path("boutiques/", include("apps.shops.urls", namespace="shops")),
     path("articles/", include("apps.catalog.urls", namespace="catalog")),

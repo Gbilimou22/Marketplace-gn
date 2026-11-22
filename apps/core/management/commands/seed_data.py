@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand
 from apps.accounts.models import SellerProfile, User
 from apps.accounts.services import seller_profile_request, seller_profile_verify
 from apps.catalog.models import Category, Product
-from apps.catalog.services import category_create, product_create, product_publish
+from apps.catalog.services import category_create, product_create
 from apps.shops.models import Shop
 from apps.shops.services import shop_activate, shop_create
 
