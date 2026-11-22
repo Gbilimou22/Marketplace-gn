@@ -1,60 +1,118 @@
 {% extends "base.html" %}
 
-{% block title %}{{ shop.name }} - Place de Marché Guinée{% endblock %}
+{% block title %}Boutique {{ shop.name }} - {{ shop.city }} | Marché Guinée{% endblock %}
 
 {% block content %}
-<div class="card" style="margin-bottom: 1.5rem;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+<!-- En-tête Vitrine Boutique -->
+<div class="card" style="margin-bottom: 2rem; padding: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem;">
         <div>
-            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-                <h1 style="font-size: 1.6rem;">{{ shop.name }}</h1>
-                {% if shop.is_active %}
-                    <span class="badge badge-active">Boutique Vérifiée</span>
-                {% elif shop.is_pending_review %}
-                    <span class="badge badge-pending">En attente de validation</span>
-                {% elif shop.is_draft %}
-                    <span class="badge badge-draft">Brouillon</span>
-                {% else %}
-                    <span class="badge badge-suspended">Suspendue</span>
-                {% endif %}
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <div style="width: 55px; height: 55px; border-radius: var(--radius-md); background: var(--primary-100); display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">
+                    🏪
+                </div>
+                <div>
+                    <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.2rem;">{{ shop.name }}</h1>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        {% if shop.is_active %}
+                            <span class="badge badge-verified">Boutique Vérifiée</span>
+                        {% elif shop.is_pending_review %}
+                            <span class="badge badge-pending">En attente de validation</span>
+                        {% elif shop.is_draft %}
+                            <span class="badge badge-draft">Brouillon</span>
+                        {% else %}
+                            <span class="badge badge-suspended">Suspendue</span>
+                        {% endif %}
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">Responsable : {{ shop.owner.user.full_name }}</span>
+                    </div>
+                </div>
             </div>
-            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.25rem;">
-                📍 Localisation : <strong>{{ shop.city }}</strong> {% if shop.address %}({{ shop.address }}){% endif %}
-            </p>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">
-                👤 Responsable : {{ shop.owner.user.full_name }}
+
+            <p style="font-size: 0.95rem; color: var(--text-body); margin-top: 0.75rem;">
+                📍 Localisation : <strong>{{ shop.city }}</strong> {% if shop.address %}— {{ shop.address }}{% endif %}
             </p>
         </div>
 
         {% if shop.whatsapp_url %}
             <div>
-                <a href="{{ shop.whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" style="padding: 0.75rem 1.25rem; font-size: 1rem;">
-                    💬 Contacter le vendeur sur WhatsApp
+                <a href="{{ shop.whatsapp_url }}" target="_blank" rel="noopener noreferrer" 
+                   class="btn btn-whatsapp" style="padding: 0.85rem 1.4rem; font-size: 1rem; text-decoration: none;">
+                    💬 Contacter la boutique sur WhatsApp
                 </a>
             </div>
         {% endif %}
     </div>
 
     {% if shop.description %}
-        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
-            <h3 style="font-size: 1.05rem; margin-bottom: 0.5rem;">À propos de la boutique</h3>
-            <p style="white-space: pre-line; color: #374151;">{{ shop.description }}</p>
+        <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border);">
+            <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem;">À propos du commerçant</h3>
+            <p style="white-space: pre-line; color: var(--text-body); line-height: 1.7; font-size: 0.95rem;">{{ shop.description }}</p>
         </div>
     {% endif %}
 
     {% if user.is_authenticated and shop.owner.user == user %}
-        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; gap: 0.75rem;">
-            <a href="{% url 'shops:update' slug=shop.slug %}" class="btn btn-outline">Modifier ma boutique</a>
-            <a href="{% url 'shops:seller_dashboard' %}" class="btn btn-outline">Tableau de bord</a>
+        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="{% url 'shops:update' slug=shop.slug %}" class="btn btn-outline btn-sm">✏️ Modifier la boutique</a>
+            <a href="{% url 'catalog:create' shop_slug=shop.slug %}" class="btn btn-primary btn-sm">+ Ajouter un article</a>
+            <a href="{% url 'shops:seller_dashboard' %}" class="btn btn-outline btn-sm">Tableau de bord</a>
         </div>
     {% endif %}
 </div>
 
-<!-- Emplacement pour le catalogue d'articles (Phase 3) -->
-<div class="card" style="text-align: center; padding: 2rem 1rem;">
-    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Articles en vente</h3>
-    <p style="color: var(--text-muted); font-size: 0.95rem;">
-        Le catalogue de produits de cette boutique sera consultable ici dès la Phase 3.
-    </p>
+<!-- Rayon des articles de cette boutique -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--text-main);">
+        Articles en vente dans cette boutique ({{ shop.products.count }})
+    </h2>
+</div>
+
+<div class="product-grid">
+    {% for product in shop.products.all %}
+        {% if product.is_published or user.is_authenticated and shop.owner.user == user %}
+            <div class="product-card">
+                <div>
+                    <a href="{% url 'catalog:detail' slug=product.slug %}" style="text-decoration: none; color: inherit;">
+                        <div class="product-card-img-wrapper">
+                            {% if product.cover_image %}
+                                <img src="{{ product.cover_image.image.url }}" alt="{{ product.title }}" loading="lazy">
+                            {% else %}
+                                <div style="font-size: 3rem; color: var(--text-light);">🛍️</div>
+                            {% endif %}
+                            <span class="product-card-badge">
+                                {{ product.get_condition_display }}
+                            </span>
+                        </div>
+
+                        <div class="product-card-body">
+                            <div class="product-card-price">
+                                {{ product.price_gnf|floatformat:0 }} <span style="font-size: 0.85rem;">GNF</span>
+                            </div>
+                            <h3 class="product-card-title">{{ product.title }}</h3>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="product-card-footer">
+                    <a href="{% url 'catalog:detail' slug=product.slug %}" class="btn btn-outline btn-sm" style="flex: 1;">
+                        Voir l'article
+                    </a>
+                    {% if product.whatsapp_order_url %}
+                        <a href="{{ product.whatsapp_order_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-sm" style="flex: 1.2;">
+                            💬 WhatsApp
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    {% empty %}
+        <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1.5rem;">
+            <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1rem;">
+                Cette boutique n'a pas encore publié d'articles.
+            </p>
+            {% if user.is_authenticated and shop.owner.user == user %}
+                <a href="{% url 'catalog:create' shop_slug=shop.slug %}" class="btn btn-primary">+ Ajouter mon premier article</a>
+            {% endif %}
+        </div>
+    {% endfor %}
 </div>
 {% endblock %}

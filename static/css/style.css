@@ -1,0 +1,561 @@
+/* ==========================================================================
+   Place de Marché Guinée - Design System Professionnel
+   Conçu pour la performance mobile (léger, réactif, sans bundler externe)
+   ========================================================================== */
+
+:root {
+    /* Couleurs Primaires (Teal / Émeraude haut de gamme) */
+    --primary-50: #F0FDFA;
+    --primary-100: #CCFBF1;
+    --primary-500: #14B8A6;
+    --primary-600: #0D9488;
+    --primary-700: #0F766E;
+    --primary-800: #115E59;
+    --primary-900: #134E4A;
+    --primary: var(--primary-700);
+    --primary-hover: var(--primary-800);
+
+    /* WhatsApp Brand Color */
+    --whatsapp-green: #25D366;
+    --whatsapp-dark: #128C7E;
+    --whatsapp-hover: #1EBE5D;
+
+    /* Neutres (Slate Palette) */
+    --bg-page: #F8FAFC;
+    --surface: #FFFFFF;
+    --border: #E2E8F0;
+    --border-hover: #CBD5E1;
+    --text-main: #0F172A;
+    --text-body: #334155;
+    --text-muted: #64748B;
+    --text-light: #94A3B8;
+
+    /* États & Feedback */
+    --success-bg: #ECFDF5;
+    --success-text: #065F46;
+    --success-border: #A7F3D0;
+    --warning-bg: #FFFBEB;
+    --warning-text: #92400E;
+    --warning-border: #FDE68A;
+    --danger-bg: #FFF1F2;
+    --danger-text: #9F1239;
+    --danger-border: #FECDD3;
+
+    /* Ombres douces & Éléments */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+
+    /* Typographie */
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Reset & Base */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-page);
+    color: var(--text-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+a:hover {
+    color: var(--primary-hover);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Barre de Réassurance Supérieure (Top Trust Bar) */
+.top-trust-bar {
+    background: #042F2E;
+    color: #CCFBF1;
+    font-size: 0.78rem;
+    padding: 0.35rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.top-trust-bar .trust-items {
+    display: flex;
+    gap: 1.25rem;
+    margin: 0 auto;
+    max-width: 1100px;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.top-trust-bar span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+/* Header & Navigation Principale */
+header.main-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+}
+
+.nav-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -0.02em;
+}
+
+.brand-logo .brand-badge {
+    background: var(--primary-100);
+    color: var(--primary-700);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+}
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.nav-link {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-body);
+    padding: 0.4rem 0.6rem;
+    border-radius: var(--radius-sm);
+    transition: all 0.15s ease;
+}
+
+.nav-link:hover {
+    color: var(--primary);
+    background: var(--primary-50);
+}
+
+.nav-cta {
+    background: var(--primary);
+    color: #FFFFFF !important;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0.45rem 0.9rem;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.nav-cta:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+/* Conteneur Principal */
+main.site-content {
+    max-width: 1100px;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+    min-height: 75vh;
+}
+
+/* Cartes (Cards) */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-hover);
+}
+
+/* Boutons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1.1rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #FFFFFF;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    color: #FFFFFF;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-whatsapp {
+    background: var(--whatsapp-green);
+    color: #FFFFFF;
+    font-weight: 700;
+}
+
+.btn-whatsapp:hover {
+    background: var(--whatsapp-hover);
+    color: #FFFFFF;
+    box-shadow: 0 4px 10px rgba(37, 211, 102, 0.35);
+}
+
+.btn-outline {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-body);
+}
+
+.btn-outline:hover {
+    background: #F1F5F9;
+    border-color: var(--text-muted);
+    color: var(--text-main);
+}
+
+.btn-sm {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.82rem;
+}
+
+/* Badges */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.badge-active, .badge-verified {
+    background: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
+}
+
+.badge-pending {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+    border: 1px solid var(--warning-border);
+}
+
+.badge-draft {
+    background: #F1F5F9;
+    color: #475569;
+    border: 1px solid #CBD5E1;
+}
+
+.badge-suspended {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+    border: 1px solid var(--danger-border);
+}
+
+/* Formulaires Élégants */
+.form-group {
+    margin-bottom: 1.15rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 0.35rem;
+}
+
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    font-family: inherit;
+}
+
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+}
+
+/* Messages & Alertes */
+.messages-container {
+    list-style: none;
+    margin-bottom: 1.25rem;
+}
+
+.message-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1.1rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.5rem;
+    font-size: 0.92rem;
+    font-weight: 500;
+}
+
+.message-item.success {
+    background: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
+}
+
+.message-item.warning {
+    background: var(--warning-bg);
+    color: var(--warning-text);
+    border: 1px solid var(--warning-border);
+}
+
+.message-item.error {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+    border: 1px solid var(--danger-border);
+}
+
+/* Grille E-commerce Produits */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 1.25rem;
+}
+
+.product-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-hover);
+}
+
+.product-card-img-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: #F1F5F9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.product-card-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-card-img-wrapper img {
+    transform: scale(1.03);
+}
+
+.product-card-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(15, 23, 42, 0.75);
+    color: #FFFFFF;
+    backdrop-filter: blur(4px);
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+}
+
+.product-card-body {
+    padding: 0.95rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card-title {
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.35;
+    margin-bottom: 0.4rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 2.7rem;
+}
+
+.product-card-price {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--primary-700);
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5rem;
+}
+
+.product-card-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.product-card-footer {
+    padding: 0.8rem 0.95rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 0.5rem;
+    background: #FAFBFD;
+}
+
+/* Footer Professionnel */
+footer.site-footer {
+    background: #0F172A;
+    color: #94A3B8;
+    padding: 3rem 1rem 1.5rem;
+    margin-top: 4rem;
+    border-top: 1px solid #1E293B;
+}
+
+.footer-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.footer-col h4 {
+    color: #FFFFFF;
+    font-size: 0.98rem;
+    font-weight: 700;
+    margin-bottom: 0.85rem;
+}
+
+.footer-col p {
+    font-size: 0.88rem;
+    line-height: 1.6;
+}
+
+.footer-links {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: 0.45rem;
+}
+
+.footer-links a {
+    color: #94A3B8;
+    font-size: 0.88rem;
+}
+
+.footer-links a:hover {
+    color: #FFFFFF;
+}
+
+.footer-bottom {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid #1E293B;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #64748B;
+}
+
+/* Responsivité Mobile */
+@media (max-width: 768px) {
+    .nav-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    .nav-menu {
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    .product-card-price {
+        font-size: 1.05rem;
+    }
+    .product-card-title {
+        font-size: 0.88rem;
+        height: 2.4rem;
+    }
+}

@@ -1,65 +1,80 @@
 {% extends "base.html" %}
 
-{% block title %}Boutiques vérifiées - Place de Marché Guinée{% endblock %}
+{% block title %}Boutiques certifiées de Guinée - Marché Guinée{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 1.5rem;">
-    <h1 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Boutiques certifiées de Guinée</h1>
-    <p style="color: var(--text-muted); font-size: 0.95rem;">Commerçants physiques et vendeurs de confiance vérifiés par notre équipe.</p>
+<div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem;">
+        Boutiques vérifiées de Guinée
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1rem;">
+        Découvrez les commerçants physiques de Conakry et de l'intérieur de la Guinée dont l'activité a été vérifiée par notre équipe.
+    </p>
 </div>
 
 <!-- Filtre par Ville / Commune -->
-<form method="get" class="card" style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; padding: 0.75rem 1rem;">
-    <label for="city-select" style="font-size: 0.9rem; font-weight: 500;">Filtrer par localité :</label>
-    <select name="city" id="city-select" class="form-select" style="max-width: 250px;">
-        <option value="">Toutes les villes / communes</option>
-        {% for val, label in cities %}
-            <option value="{{ val }}" {% if val == selected_city %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem;">Filtrer</button>
-    {% if selected_city %}
-        <a href="{% url 'shops:list' %}" class="btn btn-outline" style="font-size: 0.85rem;">Réinitialiser</a>
-    {% endif %}
-</form>
+<div class="card" style="margin-bottom: 2rem; padding: 1rem 1.25rem;">
+    <form method="get" style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+        <label for="city-select" style="font-size: 0.9rem; font-weight: 600; color: var(--text-main);">Filtrer par localité :</label>
+        <select name="city" id="city-select" class="form-select" style="max-width: 280px;" onchange="this.form.submit()">
+            <option value="">Toutes les localités de Guinée</option>
+            {% for val, label in cities %}
+                <option value="{{ val }}" {% if val == selected_city %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        {% if selected_city %}
+            <a href="{% url 'shops:list' %}" class="btn btn-outline btn-sm">Réinitialiser</a>
+        {% endif %}
+    </form>
+</div>
 
-<!-- Liste des boutiques -->
-<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+<!-- Liste des boutiques sous forme de cartes d'entreprises -->
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
     {% for shop in shops %}
         <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
             <div>
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                    <h2 style="font-size: 1.15rem; font-weight: 600;">
-                        <a href="{% url 'shops:detail' slug=shop.slug %}" style="text-decoration: none; color: var(--text);">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                    <h2 style="font-size: 1.25rem; font-weight: 700;">
+                        <a href="{% url 'shops:detail' slug=shop.slug %}" style="color: var(--text-main);">
                             {{ shop.name }}
                         </a>
                     </h2>
-                    <span class="badge badge-active">Vérifiée</span>
+                    <span class="badge badge-verified">Vérifiée</span>
                 </div>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">
-                    📍 {{ shop.city }}{% if shop.address %} • {{ shop.address }}{% endif %}
+
+                <p style="color: var(--primary-700); font-weight: 600; font-size: 0.88rem; margin-bottom: 0.5rem;">
+                    📍 {{ shop.city }}
                 </p>
+                {% if shop.address %}
+                    <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 0.75rem;">
+                        {{ shop.address }}
+                    </p>
+                {% endif %}
+
                 {% if shop.description %}
-                    <p style="font-size: 0.9rem; color: #4B5563; margin-bottom: 1rem;">
-                        {{ shop.description|truncatewords:20 }}
+                    <p style="font-size: 0.92rem; color: var(--text-body); line-height: 1.5; margin-bottom: 1.25rem;">
+                        {{ shop.description|truncatewords:24 }}
                     </p>
                 {% endif %}
             </div>
-            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                <a href="{% url 'shops:detail' slug=shop.slug %}" class="btn btn-outline" style="flex: 1;">Voir la boutique</a>
+
+            <div style="display: flex; gap: 0.6rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+                <a href="{% url 'shops:detail' slug=shop.slug %}" class="btn btn-outline btn-sm" style="flex: 1;">
+                    Voir la vitrine
+                </a>
                 {% if shop.whatsapp_url %}
-                    <a href="{{ shop.whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp" style="flex: 1;">
-                        WhatsApp
+                    <a href="{{ shop.whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp btn-sm" style="flex: 1.2;">
+                        💬 WhatsApp
                     </a>
                 {% endif %}
             </div>
         </div>
     {% empty %}
-        <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 2.5rem 1rem;">
-            <p style="font-size: 1.05rem; color: var(--text-muted); margin-bottom: 1rem;">
+        <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 4rem 1.5rem;">
+            <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 1rem;">
                 Aucune boutique active trouvée pour cette sélection.
             </p>
-            <a href="{% url 'shops:create' %}" class="btn btn-primary">Ouvrir ma boutique gratuitement</a>
+            <a href="{% url 'account_signup' %}" class="btn btn-primary">Ouvrir ma boutique gratuitement</a>
         </div>
     {% endfor %}
 </div>
