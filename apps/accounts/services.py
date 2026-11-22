@@ -1,4 +1,4 @@
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.utils import timezone
 
 from apps.accounts.models import SellerProfile, User
@@ -36,7 +36,11 @@ def seller_profile_request(*, user: User) -> SellerProfile:
     """
     Registers a request to become a seller.
     Status starts in PENDING for manual admin validation.
+    Administrators/staff cannot become sellers (strict role separation).
     """
+    if user.is_staff or user.is_superuser:
+        raise PermissionDenied("Les comptes administrateurs sont réservés à la modération et ne peuvent pas créer de profil vendeur.")
+
     if hasattr(user, "seller_profile"):
         profile = user.seller_profile
         if profile.status == SellerProfile.Status.SUSPENDED:

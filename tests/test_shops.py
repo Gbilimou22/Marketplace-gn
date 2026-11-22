@@ -94,6 +94,16 @@ class TestShopCreationAndBasics:
         assert shop1.slug == "mode-feminine"
         assert shop2.slug == "mode-feminine-1"
 
+    def test_admin_cannot_request_seller_profile_nor_create_shop(self, admin_user):
+        with pytest.raises(PermissionDenied, match="Les comptes administrateurs"):
+            seller_profile_request(user=admin_user)
+
+    def test_admin_create_view_redirects_away(self, client, admin_user):
+        client.force_login(admin_user)
+        response = client.get(reverse("shops:create"))
+        assert response.status_code == 302
+        assert response.url == reverse("shops:seller_dashboard")
+
 
 @pytest.mark.django_db
 class TestShopLifecycleAndPermissions:

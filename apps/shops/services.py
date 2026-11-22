@@ -19,7 +19,11 @@ def shop_create(
 ) -> Shop:
     """
     Creates a new shop in DRAFT status for a seller.
+    Administrators/staff cannot own shops (moderator role separation).
     """
+    if owner.user.is_staff or owner.user.is_superuser:
+        raise PermissionDenied("Un administrateur ou modérateur ne peut pas créer ni posséder de boutique.")
+
     if not name.strip():
         raise ValidationError("Le nom de la boutique est obligatoire.")
 

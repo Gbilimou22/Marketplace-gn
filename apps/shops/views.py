@@ -85,11 +85,21 @@ class ShopCreateView(LoginRequiredMixin, CreateView):
     """
     View allowing an authenticated user to register a new shop.
     Automatically initializes SellerProfile if needed.
+    Administrators are strictly moderators and cannot create shops.
     """
 
     model = Shop
     form_class = ShopForm
     template_name = "shops/shop_form.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
+            messages.warning(
+                request,
+                "Votre compte est un compte administrateur / modérateur. Les modérateurs ne peuvent pas créer de boutique vendeuse.",
+            )
+            return redirect("shops:seller_dashboard")
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         # Automatically ensure seller profile exists

@@ -62,7 +62,11 @@
             <nav class="nav-links">
                 <a href="{% url 'shops:list' %}">Boutiques</a>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'shops:seller_dashboard' %}">Espace Vendeur</a>
+                    {% if user.is_staff %}
+                        <a href="{% url 'admin:index' %}" style="font-weight: 600; color: var(--primary);">⚙️ Modération Admin</a>
+                    {% else %}
+                        <a href="{% url 'shops:seller_dashboard' %}">Espace Vendeur</a>
+                    {% endif %}
                     <a href="{% url 'account_logout' %}">Déconnexion ({{ user.full_name }})</a>
                 {% else %}
                     <a href="{% url 'account_login' %}">Connexion</a>
